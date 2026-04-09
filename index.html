@@ -1,0 +1,466 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Nietzsche-foundation</title>
+    <!-- Import Google Fonts -->
+     <link rel="icon" 
+    href="imgs/icon.jfif" 
+    type="image/x-icon">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=PT+Serif:wght@400;700&family=IBM+Plex+Mono:wght@400;500&family=Pacifico&family=Cinzel:wght@400;700&display=swap">
+    <style>
+        /* Base styles and variables for Light Theme */
+        :root {
+            --primary-font: 'Cinzel', serif;
+            --secondary-font: 'IBM Plex Mono', monospace;
+            --name-font: 'Pacifico', cursive;
+            --text-color: #1a1a1a;
+            --secondary-text-color: #6b7280;
+            --background-color: #ffffff;
+            --accent-color: #000000;
+            --border-color: #e5e7eb;
+            --card-bg-color: #f9fafb;
+            --card-hover-bg-color: #ffffff;
+            --input-bg: #f3f4f6;
+        }
+
+        /* Dark theme variables */
+        body.dark-theme {
+            --text-color: #e5e7eb;
+            --secondary-text-color: #9ca3af;
+            --background-color: #0f172a;
+            --accent-color: #f3f4f6;
+            --border-color: #334155;
+            --card-bg-color: #1e293b;
+            --card-hover-bg-color: #334155;
+            --input-bg: #1e293b;
+        }
+
+        /* Basic reset and typography */
+        body {
+            font-family: var(--secondary-font);
+            color: var(--text-color);
+            background-color: var(--background-color);
+            margin: 0;
+            padding: 0;
+            cursor: none;
+            overflow-x: hidden;
+            line-height: 1.6;
+            transition: background-color 0.3s ease, color 0.3s ease;
+        }
+
+        h1, h3 {
+            font-family: var(--primary-font);
+            font-weight: 700;
+            color: var(--accent-color);
+        }
+
+        a {
+            color: var(--text-color);
+            text-decoration: none;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 0 1.5rem;
+        }
+
+        /* Custom Mouse Cursor */
+        .cursor {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 20px;
+            height: 20px;
+            background-color: rgba(107, 114, 128, 0.5);
+            border-radius: 50%;
+            pointer-events: none;
+            transition: width 0.3s ease, height 0.3s ease, background-color 0.3s ease, transform 0.1s ease;
+            z-index: 9999;
+            transform: translate(-50%, -50%);
+        }
+        .cursor.active {
+            width: 50px;
+            height: 50px;
+            background-color: rgba(128, 128, 128, 0.2);
+            border: 1px solid var(--accent-color);
+        }
+        @media (pointer: coarse) {
+            .cursor { display: none; }
+            body { cursor: auto; }
+        }
+
+        /* Header */
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1.5rem 0;
+            border-bottom: 1px solid var(--border-color);
+            position: sticky;
+            top: 0;
+            background-color: var(--background-color);
+            z-index: 100;
+        }
+        .logo-container {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+        .logo-image {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: var(--accent-color);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--background-color);
+            font-family: var(--name-font);
+            font-size: 1.2rem;
+        }
+        .logo-text {
+            font-size: 1.5rem;
+            font-weight: bold;
+            font-family: var(--primary-font);
+        }
+
+        .theme-toggle {
+            padding: 0.6rem;
+            display: flex;
+            align-items: center;
+            border-radius: 50%;
+            cursor: pointer;
+            border: 1px solid var(--border-color);
+        }
+
+        /* Search and Filter Section */
+        .controls-container {
+            margin: 2rem 0;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 1rem;
+            justify-content: center;
+        }
+
+        .search-input, .filter-select {
+            padding: 0.8rem 1.2rem;
+            font-family: var(--secondary-font);
+            border-radius: 8px;
+            border: 1px solid var(--border-color);
+            background-color: var(--input-bg);
+            color: var(--text-color);
+            outline: none;
+            font-size: 0.9rem;
+            transition: border-color 0.3s ease;
+        }
+
+        .search-input {
+            width: 100%;
+            max-width: 400px;
+        }
+
+        .filter-select {
+            cursor: pointer;
+        }
+
+        .search-input:focus, .filter-select:focus {
+            border-color: var(--accent-color);
+        }
+
+        /* Books Section */
+        .books-section {
+            padding: 2rem 0 4rem 0;
+            text-align: center;
+        }
+        .books-section h1 {
+            font-size: 3.5rem;
+            margin-bottom: 1rem;
+            letter-spacing: 2px;
+        }
+        .subtitle {
+            margin-bottom: 2rem;
+            color: var(--secondary-text-color);
+            font-style: italic;
+        }
+
+        .books-grid {
+            display: grid;
+            /* Updated to use smaller min-width for more columns */
+            grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+            gap: 2rem;
+            min-height: 400px;
+        }
+
+        .book-card {
+            background-color: var(--card-bg-color);
+            border-radius: 12px;
+            overflow: hidden;
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            display: flex;
+            flex-direction: column;
+            border: 1px solid var(--border-color);
+        }
+
+        .book-card:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 15px 30px -5px rgba(0, 0, 0, 0.1);
+            border-color: var(--accent-color);
+        }
+
+        /* Updated cover wrapper for smaller display */
+        .cover-wrapper {
+            width: 100%;
+            aspect-ratio: 3/4; /* Slightly shorter aspect ratio */
+            overflow: hidden;
+            background-color: #ddd;
+            position: relative;
+        }
+
+        .book-cover {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform 0.5s ease;
+        }
+
+        .card-content {
+            padding: 1.25rem; /* Reduced padding */
+            display: flex;
+            flex-direction: column;
+            flex-grow: 1;
+        }
+
+        .book-tag {
+            font-size: 0.6rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: var(--secondary-text-color);
+            margin-bottom: 0.4rem;
+        }
+
+        .book-title {
+            font-size: 1.05rem; /* Slightly smaller font */
+            margin: 0.2rem 0;
+            line-height: 1.3;
+            min-height: 2.8rem;
+        }
+
+        .book-author {
+            font-size: 0.8rem;
+            font-weight: 500;
+            margin-bottom: 1.2rem;
+            color: var(--secondary-text-color);
+        }
+
+        /* Buttons */
+        .book-actions {
+            display: flex;
+            margin-top: auto;
+        }
+
+        .btn-download {
+            width: 100%;
+            padding: 0.7rem;
+            font-family: var(--secondary-font);
+            font-size: 0.7rem;
+            font-weight: 700;
+            text-align: center;
+            border-radius: 6px;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            background-color: var(--accent-color);
+            color: var(--background-color);
+            border: 1px solid var(--accent-color);
+            letter-spacing: 1px;
+        }
+
+        .btn-download:hover {
+            filter: brightness(1.2);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+
+        /* No Results Message */
+        .no-results {
+            grid-column: 1 / -1;
+            padding: 4rem;
+            font-size: 1.2rem;
+            color: var(--secondary-text-color);
+        }
+
+        /* Footer */
+        footer {
+            padding: 3rem 0;
+            text-align: center;
+            border-top: 1px solid var(--border-color);
+            margin-top: 4rem;
+            color: var(--secondary-text-color);
+        }
+
+        @media (max-width: 640px) {
+            .books-section h1 { font-size: 2.2rem; }
+            .books-grid { grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 1rem; }
+            .controls-container { flex-direction: column; align-items: stretch; }
+            .search-input { max-width: none; }
+        }
+    </style>
+</head>
+<body>
+    <div class="cursor"></div>
+
+    <div class="container">
+        <header>
+            <div class="logo-container interactive-element">
+                <div class="logo-image">Nietzsche-foundation</div>
+                <span class="logo-text">Nietzsche-foundation</span>
+            </div>
+            <div id="theme-toggle" class="theme-toggle interactive-element">
+                <svg id="sun-icon" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="5"></circle><line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line><line x1="1" y1="12" x2="3" y2="12"></line><line x1="21" y1="12" x2="23" y2="12"></line><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line></svg>
+                <svg id="moon-icon" style="display:none;" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>
+            </div>
+        </header>
+
+        <section class="books-section">
+            <h1>Graduate Library</h1>
+            <p class="subtitle">A curated collection of foundational philosophy texts.</p>
+            
+            <div class="controls-container">
+                <input type="text" id="search-bar" class="search-input interactive-element" placeholder="Search by author or title...">
+                <select id="category-filter" class="filter-select interactive-element">
+                    <option value="all">All Categories</option>
+                    <!-- Categories added by JS -->
+                </select>
+            </div>
+
+            <div id="books-grid" class="books-grid">
+                <!-- Dynamic Content -->
+            </div>
+        </section>
+
+        <footer>
+            <p>&copy; 2026, Built for Philosophers.</p>
+        </footer>
+    </div>
+
+    <script>
+        const books = [
+            { title: "Critique of Pure Reason", author: "Immanuel Kant", category: "Metaphysics", url: "books/critique.pdf", cover: "imgs/critique.jpg" },
+            { title: "Phenomenology of Spirit", author: "G.W.F. Hegel", category: "Continental", url: "books/hegel.pdf", cover: "imgs/phenomenology.jpg" },
+            { title: "Being and Time", author: "Martin Heidegger", category: "Phenomenology", url: "books/beingtime.pdf", cover: "imgs/being.jpg" },
+            { title: "Tractatus Logico-Philosophicus", author: "Ludwig Wittgenstein", category: "Logic", url: "books/tractus.pdf", cover: "imgs/tractus.jpg" },
+            { title: "Philosophical Investigations", author: "Ludwig Wittgenstein", category: "Language", url: "#", cover: "imgs/philosophical.jpg" },
+            { title: "The Second Sex", author: "Simone de Beauvoir", category: "Existentialism", url: "books/2ndsex.pdf", cover: "imgs/2ndsex.jpg" },
+            { title: "Naming and Necessity", author: "Saul Kripke", category: "Analytic", url: "books/necissity.pdf", cover: "imgs/necessity.jpg" },
+            { title: "A Theory of Justice", author: "John Rawls", category: "Political", url: "books/justice.pdf", cover: "imgs/justice.jpg" },
+            { title: "The Visible and the Invisible", author: "Maurice Merleau-Ponty", category: "Phenomenology", url: "books/visible.pdf", cover: "imgs/visibl.jpg" },
+            { title: "Difference and Repetition", author: "Gilles Deleuze", category: "Continental", url: "books/repetition.pdf", cover: "imgs/repetition.jpg" },
+            { title: "The Sovereignty of Good", author: "Iris Murdoch", category: "Ethics", url: "#", cover: "imgs/murdoch.jfif" },
+            { title: "Reasons and Persons", author: "Derek Parfit", category: "Ethics", url: "#", cover: "imgs/reason.jpg" },
+            { title: "Simulacra and Simulation", author: "Jean Baudrillard", category: "Post-Modernism", url: "books/simulation.pdf", cover: "imgs/simulacra.jpg" },
+            { title: "Anarchy, State, and Utopia", author: "Robert Nozick", category: "Political", url: "#", cover: "imgs/utopia.jpg" },
+            { title: "Word and Object", author: "W.V.O. Quine", category: "Analytic", url: "#", cover: "imgs/word.jpg" },
+            { title: "The Myth of Sisyphus", author: "Albert Camus", category: "Existentialism", url: "#", cover: "imgs/sisyphus.jpg" },
+            { title: "Madness and Civilization", author: "Michel Foucault", category: "History", url: "#", cover: "imgs/madness.jpg" },
+            { title: "Knowledge and its Limits", author: "Timothy Williamson", category: "Epistemology", url: "#", cover: "imgs/knowledgelimits.jpg" },
+            { title: "Of Grammatology", author: "Jacques Derrida", category: "Deconstruction", url: "#", cover: "imgs/off.jpg" },
+            { title: "After Virtue", author: "Alasdair MacIntyre", category: "Ethics", url: "#", cover: "imgs/virtue.jpg" }, 
+            { title: "De La Connoissance De Soi-Mesme (1694)", author: "Alasdair MacIntyre", category: "Ethics", url: "#", cover: "imgs/conno.jpg" },
+            { title: "Peter of Spain", author: "Joseph Mullally", category: "Ethics", url: "#", cover: "imgs/peter.jpg" }
+
+
+        ];
+
+        document.addEventListener('DOMContentLoaded', () => {
+            const grid = document.getElementById('books-grid');
+            const searchBar = document.getElementById('search-bar');
+            const categoryFilter = document.getElementById('category-filter');
+            const cursor = document.querySelector('.cursor');
+            const body = document.body;
+
+            // Populate Category Filter
+            const categories = ['all', ...new Set(books.map(b => b.category))];
+            categories.forEach(cat => {
+                const opt = document.createElement('option');
+                opt.value = cat;
+                opt.textContent = cat.charAt(0).toUpperCase() + cat.slice(1);
+                categoryFilter.appendChild(opt);
+            });
+
+            // Render Function
+            function renderBooks(filteredBooks) {
+                grid.innerHTML = '';
+                if (filteredBooks.length === 0) {
+                    grid.innerHTML = '<div class="no-results">No books found matching your criteria.</div>';
+                    return;
+                }
+
+                filteredBooks.forEach(book => {
+                    const card = document.createElement('div');
+                    card.className = 'book-card';
+                    card.innerHTML = `
+                        <div class="cover-wrapper">
+                            <img src="${book.cover}" alt="${book.title}" class="book-cover" onerror="this.src='https://via.placeholder.com/300x450?text=No+Cover'">
+                        </div>
+                        <div class="card-content">
+                            <span class="book-tag">${book.category}</span>
+                            <h3 class="book-title">${book.title}</h3>
+                            <p class="book-author">by ${book.author}</p>
+                            <div class="book-actions">
+                                <a href="${book.url}" target="_blank" class="btn-download interactive-element">Download</a>
+                            </div>
+                        </div>
+                    `;
+                    grid.appendChild(card);
+                });
+            }
+
+            // Filtering Logic
+            function updateGrid() {
+                const searchTerm = searchBar.value.toLowerCase();
+                const selectedCat = categoryFilter.value;
+
+                const filtered = books.filter(book => {
+                    const matchesSearch = book.title.toLowerCase().includes(searchTerm) || 
+                                         book.author.toLowerCase().includes(searchTerm);
+                    const matchesCat = selectedCat === 'all' || book.category === selectedCat;
+                    return matchesSearch && matchesCat;
+                });
+
+                renderBooks(filtered);
+            }
+
+            // Listeners
+            searchBar.addEventListener('input', updateGrid);
+            categoryFilter.addEventListener('change', updateGrid);
+
+            // Initial Render
+            renderBooks(books);
+
+            // Theme Toggle
+            const themeToggle = document.getElementById('theme-toggle');
+            themeToggle.addEventListener('click', () => {
+                body.classList.toggle('dark-theme');
+                const isDark = body.classList.contains('dark-theme');
+                document.getElementById('sun-icon').style.display = isDark ? 'none' : 'block';
+                document.getElementById('moon-icon').style.display = isDark ? 'block' : 'none';
+            });
+
+            // Cursor movements
+            document.addEventListener('mousemove', e => {
+                cursor.style.transform = `translate(${e.clientX}px, ${e.clientY}px)`;
+            });
+
+            document.addEventListener('mouseover', e => {
+                if (e.target.closest('.interactive-element')) cursor.classList.add('active');
+            });
+
+            document.addEventListener('mouseout', e => {
+                if (e.target.closest('.interactive-element')) cursor.classList.remove('active');
+            });
+        });
+    </script>
+</body>
+</html>
